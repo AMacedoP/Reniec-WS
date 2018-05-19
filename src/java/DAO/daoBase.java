@@ -5,6 +5,7 @@
  */
 package DAO;
 
+import Beans.dbCredentials;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,9 +21,10 @@ public abstract class daoBase {
     Connection conn;
 
     public daoBase() {
+        dbCredentials credentials = new dbCredentials("/creds/dbCredentials.properties");
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection();
+            conn = DriverManager.getConnection(credentials.getConnection(), credentials.getUser(), credentials.getPassword());
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(daoBase.class.getName()).log(Level.SEVERE, null, ex);
         }

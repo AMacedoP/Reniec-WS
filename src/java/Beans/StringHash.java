@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
  * @author alex
  */
 public class StringHash {
-    public String getHash(String text) throws NoSuchAlgorithmException {
+    public String getSHA(String text) throws NoSuchAlgorithmException {
         MessageDigest  m = MessageDigest.getInstance("SHA-256");
         byte[] hash = m.digest(text.getBytes(StandardCharsets.UTF_8));
         BigInteger  bigInt = new BigInteger(1, hash);
