@@ -22,7 +22,7 @@ public abstract class daoBase {
     public daoBase() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://54.146.152.235:3306/reniec", "sw2", "123456");
+            conn = DriverManager.getConnection();
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(daoBase.class.getName()).log(Level.SEVERE, null, ex);
         }
