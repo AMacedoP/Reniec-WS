@@ -5,9 +5,12 @@
  */
 package DAO;
 
+import Beans.StringHash;
+import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,22 +41,46 @@ public class daoReniec extends daoBase {
         }
     }
     
-    public void crearToken(String usuario, String password){
+    public String crearToken(String usuario){
+        int min = 4564843;
+        int max = 9999953;
+        int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);   
         
+        String token = null;
+        try {
+            token = StringHash.getSHA(Integer.toString(randomNum));
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        String sql = "UPDATE Autenticación SET token = ? Where usuario = ?";
+        try{
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, token);
+            stmt.setString(2, usuario);
+            stmt.executeUpdate();
+            return token;
+        }
+         catch (SQLException ex){
+            Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
+            return "-1";
+        }
     }
     
     public String validarCliente(String usuario, String password){
         // Revisamos si el usuario coincide con el usuario y contraseña
-        String sql = "SELECT token FROM Autenticación WHERE usuario = ? AND password = ?";
+        String sql = "SELECT * FROM Autenticación WHERE usuario = ? AND password = ?";
         try{
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, usuario);
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                return rs.getString(1);
+            if(rs.next()){
+                // Si es válido, creamos un nuevo token y lo insertamos en la tabla
+                // además de devolverlo
+                return crearToken(usuario);
             }
-            crearToken(usuario, password);
+            // Si no existe usuario, se devuelve error
             return "-1";
         }
         catch (SQLException ex){
