@@ -10,19 +10,19 @@ package Beans;
  * @author alex
  */
 public class jsonToken {
-    private Boolean error;
+    private int error;
     private String token;
     /**
      * @return the error
      */
-    public Boolean getError() {
+    public int getError() {
         return error;
     }
 
     /**
      * @param error the error to set
      */
-    public void setError(Boolean error) {
+    public void setError(int error) {
         this.error = error;
     }
 

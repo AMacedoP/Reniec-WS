@@ -68,12 +68,12 @@ public class daoReniec extends daoBase {
     }
     
     public Boolean validarToken(String token){
-        String sql = "SELECT * FROM Autenticación WHERE token = ?";
+        String sql = "SELECT * FROM Autenticación WHERE token = ? AND TIMESTAMPDIFF(MINUTE, NOW(), dateCreated) < 30 AND validToken = 1";
         try{
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, token);
             ResultSet rs = stmt.executeQuery();
-            if(rs.next()) return true;
+            if(rs.next())return true;
             return false;
         }
         catch (SQLException ex){
@@ -82,7 +82,7 @@ public class daoReniec extends daoBase {
         }
     }
     
-    public String validarCliente(String usuario, String password){
+    public String validarUsuario(String usuario, String password){
         // Revisamos si el usuario coincide con el usuario y contraseña
         String sql = "SELECT * FROM Autenticación WHERE usuario = ? AND password = ?";
         try{

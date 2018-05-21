@@ -43,11 +43,12 @@ public class WebResources {
     public String validarUsuario(@FormParam("usuario") String usuario,
                                  @FormParam("password") String password){
         daoReniec dao = new daoReniec();
-        String token  = dao.validarCliente(usuario, password);
+        String token  = dao.validarUsuario(usuario, password);
         jsonToken json = new jsonToken();
         json.setToken(token);
-        if (token.equals("-1")) json.setError(true);
-        else json.setError(false);
+        // Si hay error con el usuario se manda error 1, caso contrario 0
+        if (token.equals("-1")) json.setError(1);
+        else json.setError(0);
         Gson gson = new Gson();
         return gson.toJson(json);
     }
