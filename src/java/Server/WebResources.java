@@ -5,6 +5,7 @@
  */
 package Server;
 
+import Beans.jsonCliente;
 import Beans.jsonToken;
 import DAO.daoReniec;
 import com.google.gson.Gson;
@@ -39,7 +40,8 @@ public class WebResources {
     @Path("validarUsuario")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String validarUsuario(@FormParam("usuario") String usuario, @FormParam("password") String password){
+    public String validarUsuario(@FormParam("usuario") String usuario,
+                                 @FormParam("password") String password){
         daoReniec dao = new daoReniec();
         String token  = dao.validarCliente(usuario, password);
         jsonToken json = new jsonToken();
@@ -54,12 +56,26 @@ public class WebResources {
     @Path("validarCliente")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public String validarCliente(@FormParam("dni") String dni, @FormParam("nombre") String nombre, @FormParam("apellidoP") String apellidoP, @FormParam("apellidoM") String apellidoM) {
+    public String validarCliente(@FormParam("dni") String dni,
+                                 @FormParam("nombre") String nombre,
+                                 @FormParam("apellidoP") String apellidoP,
+                                 @FormParam("apellidoM") String apellidoM,
+                                 @FormParam("token") String token) {
         daoReniec dao = new daoReniec();
-        Boolean result = dao.validarCliente(dni, nombre, apellidoP, apellidoM);
-        HashMap<String, Boolean> json = new HashMap<>();
-        json.put("valido", result);
+        Boolean validToken = dao.validarToken(token);
         Gson gson = new Gson();
-        return gson.toJson(json);
+        // Si el token es valido, el error es 0. Caso contrario es 1
+        if(validToken){
+            Boolean result = dao.validarCliente(dni, nombre, apellidoP, apellidoM);
+            jsonCliente json = new jsonCliente();
+            json.setError(0);
+            json.setValido(result);
+            return gson.toJson(json);
+        }
+        else{
+            HashMap<String, Integer> json = new HashMap<>();
+            json.put("error", 1);
+            return gson.toJson(json);
+        }
     }
 }

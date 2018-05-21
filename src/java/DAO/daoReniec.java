@@ -61,9 +61,24 @@ public class daoReniec extends daoBase {
             stmt.executeUpdate();
             return token;
         }
-         catch (SQLException ex){
+        catch (SQLException ex){
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
             return "-1";
+        }
+    }
+    
+    public Boolean validarToken(String token){
+        String sql = "SELECT * FROM Autenticación WHERE token = ?";
+        try{
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, token);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) return true;
+            return false;
+        }
+        catch (SQLException ex){
+            Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
     }
     
