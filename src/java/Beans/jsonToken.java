@@ -12,6 +12,7 @@ package Beans;
 public class jsonToken {
     private int error;
     private String token;
+    private String message;
     /**
      * @return the error
      */
@@ -38,5 +39,19 @@ public class jsonToken {
      */
     public void setToken(String token) {
         this.token = token;
+    }
+
+    /**
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * @param message the message to set
+     */
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

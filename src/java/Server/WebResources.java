@@ -46,9 +46,15 @@ public class WebResources {
         String token  = dao.validarUsuario(usuario, password);
         jsonToken json = new jsonToken();
         json.setToken(token);
-        // Si hay error con el usuario se manda error 1, caso contrario 0
-        if (token.equals("-1")) json.setError(1);
-        else json.setError(0);
+        // Si hay error con el usuario se manda error 2, caso contrario 0
+        if (token == null){
+            json.setError(2);
+            json.setMessage("Usuario o contraseña incorrectos");
+        }
+        else{
+            json.setError(0);
+            json.setMessage("Realizado");
+        }
         Gson gson = new Gson();
         return gson.toJson(json);
     }
@@ -71,11 +77,14 @@ public class WebResources {
             jsonCliente json = new jsonCliente();
             json.setError(0);
             json.setValido(result);
+            json.setMessage("Realizado");
             return gson.toJson(json);
         }
         else{
-            HashMap<String, Integer> json = new HashMap<>();
-            json.put("error", 1);
+            jsonCliente json = new jsonCliente();
+            json.setError(1);
+            json.setValido(null);
+            json.setMessage("Token incorrecto");
             return gson.toJson(json);
         }
     }

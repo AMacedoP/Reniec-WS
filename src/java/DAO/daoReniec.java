@@ -14,10 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author alulab14
- */
 public class daoReniec extends daoBase {
     public Boolean validarCliente(String dni, String nombre, String apellidoP, String apellidoM){
         String sql = "SELECT * FROM Persona WHERE dni = ?";
@@ -53,7 +49,8 @@ public class daoReniec extends daoBase {
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        String sql = "UPDATE Autenticación SET token = ? Where usuario = ?";
+        String sql = "UPDATE Autenticación SET token = ?, dateCreated = NOW(),"
+                + "validToken = 1 Where usuario = ?";
         try{
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, token);
@@ -68,13 +65,12 @@ public class daoReniec extends daoBase {
     }
     
     public Boolean validarToken(String token){
-        String sql = "SELECT * FROM Autenticación WHERE token = ? AND TIMESTAMPDIFF(MINUTE, NOW(), dateCreated) < 30 AND validToken = 1";
+        String sql = "SELECT * FROM Autenticación WHERE token = ? AND TIMESTAMPDIFF(MINUTE, dateCreated, NOW()) < 30 AND validToken = 1;";
         try{
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, token);
             ResultSet rs = stmt.executeQuery();
-            if(rs.next())return true;
-            return false;
+            return rs.next();
         }
         catch (SQLException ex){
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
@@ -96,7 +92,7 @@ public class daoReniec extends daoBase {
                 return crearToken(usuario);
             }
             // Si no existe usuario, se devuelve error
-            return "-1";
+            return null;
         }
         catch (SQLException ex){
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
