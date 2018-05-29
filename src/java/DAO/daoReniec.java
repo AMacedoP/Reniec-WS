@@ -15,86 +15,83 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class daoReniec extends daoBase {
-    public Boolean validarCliente(String dni, String nombre, String apellidoP, String apellidoM){
+
+    public Boolean validarCliente(String dni, String nombre, String apellidoP, String apellidoM) {
         String sql = "SELECT * FROM Persona WHERE dni = ?";
-        try{
+        try {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, dni);
             ResultSet rs = stmt.executeQuery();
             String nombreDB = new String();
             String apellidoPDB = new String();
             String apellidoMDB = new String();
-            while(rs.next()){
+            while (rs.next()) {
                 nombreDB = rs.getString(2);
                 apellidoPDB = rs.getString(3);
                 apellidoMDB = rs.getString(4);
             }
             return (nombreDB.equals(nombre) && apellidoPDB.equals(apellidoP) && apellidoMDB.equals(apellidoM));
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
-    
-    public String crearToken(String usuario){
+
+    public String crearToken(String usuario) {
         int min = 4564843;
         int max = 9999953;
-        int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);   
-        
+        int randomNum = ThreadLocalRandom.current().nextInt(min, max + 1);
+
         String token = null;
         try {
             token = StringHash.getSHA(Integer.toString(randomNum));
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         String sql = "UPDATE Autenticación SET token = ?, dateCreated = NOW(),"
                 + "validToken = 1 Where usuario = ?";
-        try{
+        try {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, token);
             stmt.setString(2, usuario);
             stmt.executeUpdate();
             return token;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
             return "-1";
         }
     }
-    
-    public Boolean validarToken(String token){
+
+    public Boolean validarToken(String token) {
         String sql = "SELECT * FROM Autenticación WHERE token = ? AND TIMESTAMPDIFF(MINUTE, dateCreated, NOW()) < 30 AND validToken = 1;";
-        try{
+        try {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, token);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
-    
-    public String validarUsuario(String usuario, String password){
+
+    public String validarUsuario(String usuario, String password) {
         // Revisamos si el usuario coincide con el usuario y contraseña
         String sql = "SELECT * FROM Autenticación WHERE usuario = ? AND password = ?";
-        try{
+        try {
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, usuario);
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 // Si es válido, creamos un nuevo token y lo insertamos en la tabla
                 // además de devolverlo
                 return crearToken(usuario);
             }
             // Si no existe usuario, se devuelve error
             return null;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             Logger.getLogger(daoReniec.class.getName()).log(Level.SEVERE, null, ex);
             return "-1";
         }
